@@ -1,5 +1,7 @@
 package com.kerware.simulateur;
 
+import com.kerware.simulateur.exception.DeclarantSeulException;
+
 /**
  *  Cette classe permet de simuler le calcul de l'impôt sur le revenu
  *  en France pour l'année 2024 sur les revenus de l'année 2023 pour
@@ -240,52 +242,67 @@ public class SimulateurHerite {
 
     }
 
-    //Nouveau champ
+    //Nouveaux champs
     private SituationFamiliale situationFamiliale;
+    private int revenusNetDeclarant2;
+    private int abattementDeclarant2;
     
     /**
-     * Changer le revenus net
-     * @param rn le nouveu revenus net
+     * Changer le revenus net du premier déclarant
+     * @param revenusNetDeclarant1 le nouveu revenus net
      * @author picots
      */
-	public void setRevenusNet(int rn) {
-		rNet = rn;
+	public void setRevenusNetDeclarant1(int revenusNetDeclarant1) {
+		rNet = revenusNetDeclarant1;
+	}
+	
+	/**
+	 * Changer le revenus net du second déclarant
+	 * @param revenusNetDeclarant2 le nouveau revenus net
+	 * @throws DeclarantSeulException si le premier déclarant est un parent isolé
+	 * @author picots
+	 */
+	public void setRevenusNetDeclarant2(int revenusNetDeclarant2) throws DeclarantSeulException {
+		switch(situationFamiliale) {
+			case PACSE, MARIE -> this.revenusNetDeclarant2 = revenusNetDeclarant2;
+			default -> throw new DeclarantSeulException();
+		}
 	}
 
 	/**
-	 * Changer la siuation familiale
-	 * @param sf la nouvelle situation familiale
+	 * Changer la situation familiale
+	 * @param situationFamiliale la nouvelle situation familiale
 	 * @author picots
 	 */
-	public void setSituationsFamiliale(SituationFamiliale sf) {
-		situationFamiliale = sf;
+	public void setSituationsFamiliale(SituationFamiliale situationFamiliale) {
+		this.situationFamiliale = situationFamiliale;
 	}
 	
 	/**
 	 * Changer le nombre d'enfants à charge
-	 * @param nbe le nouveau nombre d'enfants à charge
+	 * @param nbEnfantsACharge le nouveau nombre d'enfants à charge
 	 * @author picots
 	 */
-	public void setNbEnfantsACharge(int nbe) {
-		nbEnf = nbe;
+	public void setNbEnfantsACharge(int nbEnfantsACharge) {
+		nbEnf = nbEnfantsACharge;
 	}
 	
 	/**
-	 * 
-	 * @param nbesh
+	 * Changer le nombre d'enfants en situation de handicap à charge
+	 * @param nbEnfantsSituationHandicap le nouveau nombre d'enfants en situation de handicap à charge
 	 * @author picots
 	 */
-	public void setNbEnfantsSituationHandicap(int nbesh) {
-		nbEnfH = nbesh;
+	public void setNbEnfantsSituationHandicap(int nbEnfantsSituationHandicap) {
+		nbEnfH = nbEnfantsSituationHandicap;
 	}
 	
 	/**
-	 * 
-	 * @param pi
+	 * Changer le statut de parent isolé
+	 * @param estParentIsole le nouveau statut
 	 * @author picots
 	 */
-	public void setParentIsole(boolean pi) {
-		parIso = pi;
+	public void setParentIsole(boolean estParentIsole) {
+		parIso = estParentIsole;
 	}
 	
 	/**
@@ -306,12 +323,26 @@ public class SimulateurHerite {
 	}
 	
 	/**
-	 * Obtenir l'abattement
-	 * @return l'abattement
+	 * Obtenir l'abattement du premier déclarant
+	 * @return l'abattement du premier déclarant
 	 * @author picots
 	 */
-	public int getAbattement() {
+	public int getAbattementDeclarant1() {
 		return (int)Math.round(abt);
+	}
+	
+	/**
+	 * Obtenir l'abattement du second déclarant
+	 * @return l'abattement du second déclarant
+	 * @author picots
+	 */
+	public int getAbattementDeclarant2() throws DeclarantSeulException{
+		switch (situationFamiliale) {
+			case PACSE, MARIE :
+				return abattementDeclarant2;
+			default :
+				throw new DeclarantSeulException();
+		}
 	}
 	
 	/**
@@ -324,7 +355,7 @@ public class SimulateurHerite {
 	}
 	
 	/**
-	 * Obetnir la decote
+	 * Obtenir la decote
 	 * @return la decote
 	 * @author picots
 	 */
