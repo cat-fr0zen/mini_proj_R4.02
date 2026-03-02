@@ -2,6 +2,7 @@ package com.kerware.simulateur.reusine;
 
 import com.kerware.simulateur.ICalculateurImpot;
 import com.kerware.simulateur.SituationFamiliale;
+import com.kerware.simulateur.exception.DeclarantSeulException;
 
 public class AdaptateurReusine implements ICalculateurImpot{
 	
@@ -12,33 +13,33 @@ public class AdaptateurReusine implements ICalculateurImpot{
 	}
 
 	@Override
-	public void setRevenusNetDeclarant1(int rn) {
-		
+	public void setRevenusNetDeclarant1(int revenusNetDeclarant1) {
+		adapte.setRevenusNetDeclarant1(revenusNetDeclarant1);
 	}
 
 	@Override
-	public void setRevenusNetDeclarant2(int rn) {
-		
+	public void setRevenusNetDeclarant2(int revenusNetDeclarant2) throws DeclarantSeulException {
+		adapte.setRevenusNetDeclarant2(revenusNetDeclarant2);
 	}
 
 	@Override
-	public void setSituationFamiliale(SituationFamiliale sf) {
-		
+	public void setSituationFamiliale(SituationFamiliale situationFamiliale) {
+		adapte.setSituationsFamiliale(situationFamiliale);
 	}
 
 	@Override
-	public void setNbEnfantsACharge(int nbe) {
-		
+	public void setNbEnfantsACharge(int nbEnfantsACharge) {
+		adapte.setNbEnfantsACharge(nbEnfantsACharge);
 	}
 
 	@Override
-	public void setNbEnfantsSituationHandicap(int nbesh) {
-			
+	public void setNbEnfantsSituationHandicap(int nbEnfantsSituationHandicap) {
+		adapte.setNbEnfantsSituationHandicap(nbEnfantsSituationHandicap);
 	}
 
 	@Override
-	public void setParentIsole(boolean pi) {
-		
+	public void setParentIsole(boolean estParentIsole) {
+		adapte.setParentIsole(estParentIsole);
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public class AdaptateurReusine implements ICalculateurImpot{
 	}
 
 	@Override
-	public int getAbattementDeclarant2() {
+	public int getAbattementDeclarant2() throws DeclarantSeulException {
 		return 0;
 	}
 
@@ -80,6 +81,4 @@ public class AdaptateurReusine implements ICalculateurImpot{
 	public int getImpotSurRevenuNet() {
 		return 0;
 	}
-
-	
 }
