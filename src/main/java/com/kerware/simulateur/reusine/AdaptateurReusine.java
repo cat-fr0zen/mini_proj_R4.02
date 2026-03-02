@@ -49,36 +49,36 @@ public class AdaptateurReusine implements ICalculateurImpot{
 
 	@Override
 	public int getRevenuFiscalReference() {
-		return 0;
+		return adapte.getRevenuFiscalReference();
 	}
 
 	@Override
 	public int getAbattementDeclarant1() {
-		return 0;
+		return adapte.getAbattementDeclarant1();
 	}
 
 	@Override
 	public int getAbattementDeclarant2() throws DeclarantSeulException {
-		return 0;
+		return adapte.getAbattementDeclarant2();
 	}
 
 	@Override
 	public double getNbPartsFoyerFiscal() {
-		return 0;
+		return adapte.getNbPartsFoyerFiscal();
 	}
 
 	@Override
 	public int getImpotAvantDecote() {
-		return 0;
+		return adapte.getImpotAvantDecote();
 	}
 
 	@Override
 	public int getDecote() {
-		return 0;
+		return adapte.getDecote();
 	}
 
 	@Override
 	public int getImpotSurRevenuNet() {
-		return 0;
+		return adapte.getImpotSurRevenuNet();
 	}
 }
