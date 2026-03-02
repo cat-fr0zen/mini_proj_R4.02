@@ -1,4 +1,4 @@
-package td2;
+package com.kerware.simulateur;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +30,7 @@ class TestCalculateurImpot {
 	@Test
 	@DisplayName("Test du calcul de l'impôt pour un célibataire sans enfants")
 	public void testImpotSurRevenuNetPourUnCelibataireSansEnfants() {
-		calculateur.setRevenusNet(35000);
+		calculateur.setRevenusNetDeclarant1(35000);
 		calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
 		calculateur.setNbEnfantsACharge(0);
 		calculateur.setNbEnfantsSituationHandicap(0);

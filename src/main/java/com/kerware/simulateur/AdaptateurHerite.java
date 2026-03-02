@@ -9,7 +9,14 @@ public class AdaptateurHerite implements ICalculateurImpot {
 	}
 
 	@Override
-	public void setRevenusNet(int rn) {
+	public void setRevenusNetDeclarant1(int rn) {
+		//TODO
+		adapte.setRevenusNet(rn);
+	}
+	
+	@Override
+	public void setRevenusNetDeclarant2(int rn) {
+		//TODO 
 		adapte.setRevenusNet(rn);
 	}
 
@@ -44,7 +51,14 @@ public class AdaptateurHerite implements ICalculateurImpot {
 	}
 
 	@Override
-	public int getAbattement() {
+	public int getAbattementDeclarant1() {
+		//TODO
+		return adapte.getAbattement();
+	}
+	
+	@Override
+	public int getAbattementDeclarant2() {
+		//TODO
 		return adapte.getAbattement();
 	}
 
