@@ -1,5 +1,7 @@
 package com.kerware.simulateur;
 
+import com.kerware.simulateur.exception.DeclarantSeulException;
+
 public class AdaptateurHerite implements ICalculateurImpot {
 	
 	SimulateurHerite adapte;
@@ -9,35 +11,33 @@ public class AdaptateurHerite implements ICalculateurImpot {
 	}
 
 	@Override
-	public void setRevenusNetDeclarant1(int rn) {
-		//TODO
-		adapte.setRevenusNet(rn);
+	public void setRevenusNetDeclarant1(int revenusNetDeclarant1) {
+		adapte.setRevenusNetDeclarant1(revenusNetDeclarant1);
 	}
 	
 	@Override
-	public void setRevenusNetDeclarant2(int rn) {
-		//TODO 
-		adapte.setRevenusNet(rn);
+	public void setRevenusNetDeclarant2(int revenusNetDeclarant2) throws DeclarantSeulException {
+		adapte.setRevenusNetDeclarant2(revenusNetDeclarant2);
 	}
 
 	@Override
-	public void setSituationFamiliale(SituationFamiliale sf) {
-		adapte.setSituationsFamiliale(sf);
+	public void setSituationFamiliale(SituationFamiliale situationFamiliale) {
+		adapte.setSituationsFamiliale(situationFamiliale);
 	}
 
 	@Override
-	public void setNbEnfantsACharge(int nbe) {
-		adapte.setNbEnfantsACharge(nbe);
+	public void setNbEnfantsACharge(int nbEnfantsACharge) {
+		adapte.setNbEnfantsACharge(nbEnfantsACharge);
 	}
 
 	@Override
-	public void setNbEnfantsSituationHandicap(int nbesh) {
-		adapte.setNbEnfantsSituationHandicap(nbesh);
+	public void setNbEnfantsSituationHandicap(int nbEnfantsSituationHandicap) {
+		adapte.setNbEnfantsSituationHandicap(nbEnfantsSituationHandicap);
 	}
 
 	@Override
-	public void setParentIsole(boolean pi) {
-		adapte.setParentIsole(pi);
+	public void setParentIsole(boolean estParentIsole) {
+		adapte.setParentIsole(estParentIsole);
 	}
 
 	@Override
@@ -52,14 +52,12 @@ public class AdaptateurHerite implements ICalculateurImpot {
 
 	@Override
 	public int getAbattementDeclarant1() {
-		//TODO
-		return adapte.getAbattement();
+		return adapte.getAbattementDeclarant1();
 	}
 	
 	@Override
-	public int getAbattementDeclarant2() {
-		//TODO
-		return adapte.getAbattement();
+	public int getAbattementDeclarant2() throws DeclarantSeulException {
+		return adapte.getAbattementDeclarant2();
 	}
 
 	@Override
