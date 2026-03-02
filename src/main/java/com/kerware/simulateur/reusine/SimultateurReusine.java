@@ -207,4 +207,27 @@ public class SimultateurReusine {
 	public int getImpotSurRevenuNet() {
 		return impotNet;
 	}
+	
+	/**
+     * Calcule la décote applicable à l'impôt.
+     * @param impot impôt avant décote
+     * @param nbPartsDeclarants nombre de parts des déclarants (1 = seul, 2 = couple)
+     * @return montant de la décote (plafonné à l'impôt lui-même)
+     * @author picots
+     */
+    private int calculerDecote(int impot, double nbPartsDeclarants) {
+        if (impot <= 0) return 0;
+
+        double decoteCalculee = 0.0;
+
+        if (nbPartsDeclarants == 1 && impot < SEUIL_DECOTE_SEUL) {
+            decoteCalculee = DECOTE_MAX_SEUL - (impot * TAUX_DECOTE);
+        } else if (nbPartsDeclarants == 2 && impot < SEUIL_DECOTE_COUPLE) {
+            decoteCalculee = DECOTE_MAX_COUPLE - (impot * TAUX_DECOTE);
+        }
+
+        decoteCalculee = Math.round(decoteCalculee);
+        // La décote ne peut pas dépasser l'impôt lui-même
+        return (int) Math.min(decoteCalculee, impot);
+    }
 }
