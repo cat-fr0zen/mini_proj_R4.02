@@ -5,11 +5,52 @@ import com.kerware.simulateur.exception.DeclarantSeulException;
 
 public class SimultateurReusine {
 	
+	/** Tranches du barème progressif (limites supérieures en euros). REF: art. 197 CGI */
+    private static final int[] LIMITES_TRANCHES = { 0, 11_294, 28_797, 82_341, 177_106, Integer.MAX_VALUE };
+
+    /** Taux marginaux associés à chaque tranche. REF: art. 197 CGI */
+    private static final double[] TAUX_TRANCHES = { 0.0, 0.11, 0.30, 0.41, 0.45 };
+
+    /** Taux de l'abattement forfaitaire pour frais professionnels. REF: art. 83 CGI */
+    private static final double TAUX_ABATTEMENT = 0.10;
+
+    /** Abattement minimum (en euros). REF: art. 83 CGI */
+    private static final int ABATTEMENT_MIN = 495;
+
+    /** Abattement maximum (en euros). REF: art. 83 CGI */
+    private static final int ABATTEMENT_MAX = 14_171;
+
+    /** Plafond de réduction d'impôt par demi-part supplémentaire (en euros). REF: art. 197 CGI */
+    private static final double PLAFOND_DEMI_PART = 1_759.0;
+
+    /** Seuil de la décote pour un déclarant seul (en euros). REF: art. 197 I-4 CGI */
+    private static final double SEUIL_DECOTE_SEUL = 1_929.0;
+
+    /** Seuil de la décote pour un couple (en euros). REF: art. 197 I-4 CGI */
+    private static final double SEUIL_DECOTE_COUPLE = 3_191.0;
+
+    /** Décote maximale pour un déclarant seul (en euros). REF: art. 197 I-4 CGI */
+    private static final double DECOTE_MAX_SEUL = 873.0;
+
+    /** Décote maximale pour un couple (en euros). REF: art. 197 I-4 CGI */
+    private static final double DECOTE_MAX_COUPLE = 1_444.0;
+	
+    /** Le revenus net du premier déclarant */
 	private int revenusNetDeclarant1;
+	
+	/** Le revenus net du second déclarant */
 	private int revenusNetDeclarant2;
+	
+	/** La situation familiale du déclarant */
 	private SituationFamiliale situationFamiliale;
+	
+	/** Le nombre d'enfants à charge */
 	private int nbEnfantsACharge;
+	
+	/** Le nombre d'enfants à charge en situation de handicap */
 	private int nbEnfantsSituationHandicap;
+	
+	/** Le statut de parent isolé du déclarant */
 	private boolean estParentIsole;
 
 	/**
