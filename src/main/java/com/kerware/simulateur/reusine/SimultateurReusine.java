@@ -36,22 +36,22 @@ public class SimultateurReusine {
     private static final double DECOTE_MAX_COUPLE = 1_444.0;
 	
     /** Le revenus net du premier déclarant */
-	private int revenusNetDeclarant1;
+	private int revenusNetDeclarant1 = 0;
 	
 	/** Le revenus net du second déclarant */
-	private int revenusNetDeclarant2;
+	private int revenusNetDeclarant2 = 0;
 	
 	/** La situation familiale du déclarant */
 	private SituationFamiliale situationFamiliale;
 	
 	/** Le nombre d'enfants à charge */
-	private int nbEnfantsACharge;
+	private int nbEnfantsACharge = 0;
 	
 	/** Le nombre d'enfants à charge en situation de handicap */
-	private int nbEnfantsSituationHandicap;
+	private int nbEnfantsSituationHandicap = 0;
 	
 	/** Le statut de parent isolé du déclarant */
-	private boolean estParentIsole;
+	private boolean estParentIsole = false;
 
 	/**
      * Changer le revenus net du premier déclarant
@@ -110,4 +110,18 @@ public class SimultateurReusine {
 	public void setParentIsole(boolean estParentIsole) {
 		this.estParentIsole = estParentIsole;
 	}
+	
+	/**
+	 * Calculer l'abattement à partir d'un revenus net
+	 * @param revenusNet le revenus net
+	 * @return l'abattement
+	 */
+	private int calculerAbattement(int revenusNet) {
+        if (revenusNet <= 0) return 0;
+        double abattement = revenusNet * TAUX_ABATTEMENT;
+        abattement = Math.min(abattement, ABATTEMENT_MAX);
+        abattement = Math.max(abattement, ABATTEMENT_MIN);
+        return (int) Math.round(abattement);
+    }
+
 }
