@@ -3,6 +3,10 @@ package com.kerware.simulateur.reusine;
 import com.kerware.simulateur.SituationFamiliale;
 import com.kerware.simulateur.exception.DeclarantSeulException;
 
+/**
+ * Le nouveau simulateur avec un code testable
+ * @author picots
+ */
 public class SimultateurReusine {
 	
 	/** Tranches du barème progressif (limites supérieures en euros). REF: art. 197 CGI */
@@ -34,6 +38,9 @@ public class SimultateurReusine {
 
     /** Décote maximale pour un couple (en euros). REF: art. 197 I-4 CGI */
     private static final double DECOTE_MAX_COUPLE = 1_444.0;
+    
+    /** Taux de calcul de la décote. REF: art. 197 I-4 CGI */
+    private static final double TAUX_DECOTE = 0.4525;
 	
     /** Le revenus net du premier déclarant */
 	private int revenusNetDeclarant1 = 0;
@@ -52,6 +59,24 @@ public class SimultateurReusine {
 	
 	/** Le statut de parent isolé du déclarant */
 	private boolean estParentIsole = false;
+	
+	/** L'abattement du premier déclarant */
+	private int abattementDeclarant1 = 0;
+	
+	/** L'abattement de second déclarant */
+    private int abattementDeclarant2 = 0;
+    
+    /** Le revenus fiscal de référence */
+    private int revenuFiscalReference = 0;
+    
+    /** Le nombre de parts du foyer fiscal */
+    private double nbPartsFoyerFiscal = 0.0;
+    
+    /** La décôte */
+    private int decote = 0;
+    
+    /** L'impôt sur le revenus net */
+    private int impotNet = 0;
 
 	/**
      * Changer le revenus net du premier déclarant
@@ -124,4 +149,62 @@ public class SimultateurReusine {
         return (int) Math.round(abattement);
     }
 
+	/**
+	 * Obtenir le revenus fiscal de référence
+	 * @return le revenus fiscal de référence
+	 * @author picots
+	 */
+	public int getRevenuFiscalReference() {
+		return revenuFiscalReference;
+	}
+	
+	/**
+	 * Obtenir l'abattement du premier déclarant
+	 * @return l'abattement du premier déclarant
+	 * @author picots
+	 */
+	public int getAbattementDeclarant1() {
+		return abattementDeclarant1;
+	}
+	
+	/**
+	 * Obtenir l'abattement du second déclarant
+	 * @return l'abattement du second déclarant
+	 * @author picots
+	 */
+	public int getAbattementDeclarant2() throws DeclarantSeulException{
+		switch (situationFamiliale) {
+			case PACSE, MARIE :
+				return abattementDeclarant2;
+			default :
+				throw new DeclarantSeulException();
+		}
+	}
+	
+	/**
+	 * Obtenir le nombre de parts du foyer fiscal
+	 * @return le nombre de parts du foyer fiscal
+	 * @author picots
+	 */
+	public double getNbPartsFoyerFiscal() {
+		return nbPartsFoyerFiscal;
+	}
+	
+	/**
+	 * Obtenir la decote
+	 * @return la decote
+	 * @author picots
+	 */
+	public int getDecote() {
+		return decote;
+	}
+	
+	/**
+	 * Obtenir l'impôt sur le revenu net
+	 * @return l'impôt sur le revenu net
+	 * @author picots
+	 */
+	public int getImpotSurRevenuNet() {
+		return impotNet;
+	}
 }
