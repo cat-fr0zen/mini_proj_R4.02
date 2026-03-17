@@ -159,4 +159,75 @@ class TestCalculateurImpot {
             assertEquals(0, calculateur.getRevenuFiscalReference());
         }
     }
+	
+	@Nested
+    @DisplayName("Calcul du nombre de parts du foyer fiscal")
+    class NbParts {
+
+        @Test
+        @DisplayName("Célibataire sans enfant → 1 part")
+        void testCelibataireSansEnfant() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(1.0, calculateur.getNbPartsFoyerFiscal());
+        }
+
+        @Test
+        @DisplayName("Marié sans enfant → 2 parts")
+        void testMarieSansEnfant() throws DeclarantSeulException {
+            calculateur.setSituationFamiliale(SituationFamiliale.MARIE);
+            calculateur.setRevenusNetDeclarant1(30_000);
+            calculateur.setRevenusNetDeclarant2(20_000);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(2.0, calculateur.getNbPartsFoyerFiscal());
+        }
+
+        @Test
+        @DisplayName("Marié avec 2 enfants → 3 parts")
+        void testMarieDeuxEnfants() throws DeclarantSeulException {
+            calculateur.setSituationFamiliale(SituationFamiliale.MARIE);
+            calculateur.setRevenusNetDeclarant1(40_000);
+            calculateur.setRevenusNetDeclarant2(20_000);
+            calculateur.setNbEnfantsACharge(2);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(3.0, calculateur.getNbPartsFoyerFiscal());
+        }
+
+        @Test
+        @DisplayName("Célibataire, parent isolé, 1 enfant → 2 parts")
+        void testParentIsole1Enfant() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(1);
+            calculateur.setParentIsole(true);
+            calculateur.calculImpotSurRevenuNet();
+            // 1 (célibataire) + 0.5 (enfant) + 0.5 (parent isolé) = 2
+            assertEquals(2.0, calculateur.getNbPartsFoyerFiscal());
+        }
+
+        @Test
+        @DisplayName("Marié, 2 enfants dont 1 handicapé → 3.5 parts")
+        void testMarieEnfantHandicape() throws DeclarantSeulException {
+            calculateur.setSituationFamiliale(SituationFamiliale.MARIE);
+            calculateur.setRevenusNetDeclarant1(40_000);
+            calculateur.setRevenusNetDeclarant2(20_000);
+            calculateur.setNbEnfantsACharge(2);
+            calculateur.setNbEnfantsSituationHandicap(1);
+            calculateur.calculImpotSurRevenuNet();
+            // 2 + 1 (2 enfants) + 0.5 (handicap) = 3.5
+            assertEquals(3.5, calculateur.getNbPartsFoyerFiscal());
+        }
+
+        @Test
+        @DisplayName("Célibataire, 3 enfants → 2.5 parts")
+        void testCelibataireTroisEnfants() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(3);
+            calculateur.calculImpotSurRevenuNet();
+            // 1 + 0.5 * 3 = 2.5
+            assertEquals(2.5, calculateur.getNbPartsFoyerFiscal());
+        }
+    }
+
 }
