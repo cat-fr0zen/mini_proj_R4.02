@@ -124,4 +124,39 @@ class TestCalculateurImpot {
             assertEquals(3_000, calculateur.getAbattementDeclarant1());
         }
     }
+	
+	@Nested
+    @DisplayName("Revenu fiscal de référence")
+    class RevenuFiscalReference {
+
+        @Test
+        @DisplayName("Célibataire – RFR = revenu net – abattement")
+        void testCelibataire() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(30_000);
+            calculateur.calculImpotSurRevenuNet();
+            // 30 000 - 3 000 = 27 000
+            assertEquals(27_000, calculateur.getRevenuFiscalReference());
+        }
+
+        @Test
+        @DisplayName("Couple marié – RFR = somme des revenus nets – abattements")
+        void testCouple() throws DeclarantSeulException {
+            calculateur.setSituationFamiliale(SituationFamiliale.MARIE);
+            calculateur.setRevenusNetDeclarant1(40_000); // abatt. 4 000
+            calculateur.setRevenusNetDeclarant2(20_000); // abatt. 2 000
+            calculateur.calculImpotSurRevenuNet();
+            // (40 000 - 4 000) + (20 000 - 2 000) = 54 000
+            assertEquals(54_000, calculateur.getRevenuFiscalReference());
+        }
+
+        @Test
+        @DisplayName("Revenus nuls → RFR nul ou 0")
+        void testRevenusNuls() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(0);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(0, calculateur.getRevenuFiscalReference());
+        }
+    }
 }
