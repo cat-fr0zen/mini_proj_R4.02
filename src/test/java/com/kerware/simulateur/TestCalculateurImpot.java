@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import com.kerware.simulateur.AdaptateurHerite;
 import com.kerware.simulateur.ICalculateurImpot;
 import com.kerware.simulateur.SituationFamiliale;
+import com.kerware.simulateur.exception.DeclarantSeulException;
 import com.kerware.simulateur.reusine.AdaptateurReusine;
 
 class TestCalculateurImpot {
@@ -41,4 +42,43 @@ class TestCalculateurImpot {
 		assertEquals(2736, calculateur.getImpotSurRevenuNet());
 		assertEquals(1, calculateur.getNbPartsFoyerFiscal());
 	}
+	
+	@Test
+	@DisplayName("Test des setters de revenus net pour un déclarant seul")
+	public void testSituationsDeclarantSeul() {
+		
+            assertDoesNotThrow(() -> {
+                calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+                calculateur.setRevenusNetDeclarant1(30_000);
+                calculateur.calculImpotSurRevenuNet();
+            });
+            
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            assertThrows(DeclarantSeulException.class,() -> calculateur.setRevenusNetDeclarant2(20_000));
+            calculateur.setSituationFamiliale(SituationFamiliale.DIVORCE);
+            assertThrows(DeclarantSeulException.class,() -> calculateur.setRevenusNetDeclarant2(20_000));
+
+            calculateur.setSituationFamiliale(SituationFamiliale.VEUF);
+            assertThrows(DeclarantSeulException.class,() -> calculateur.setRevenusNetDeclarant2(20_000));
+        
+	}
+	
+	@Test
+    @DisplayName("Test des setters de revenus net pour deux déclarants")
+    public void testSituationsDeuxDeclarants() {
+        
+		assertDoesNotThrow(() -> {
+            calculateur.setSituationFamiliale(SituationFamiliale.MARIE);
+            calculateur.setRevenusNetDeclarant1(30_000);
+            calculateur.setRevenusNetDeclarant2(20_000);
+            calculateur.calculImpotSurRevenuNet();
+        });
+        
+        assertDoesNotThrow(() -> {
+            calculateur.setSituationFamiliale(SituationFamiliale.PACSE);
+            calculateur.setRevenusNetDeclarant1(30_000);
+            calculateur.setRevenusNetDeclarant2(15_000);
+            calculateur.calculImpotSurRevenuNet();
+        });
+    }
 }
