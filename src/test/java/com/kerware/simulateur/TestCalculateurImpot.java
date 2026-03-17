@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.kerware.simulateur.AdaptateurHerite;
@@ -80,5 +81,47 @@ class TestCalculateurImpot {
             calculateur.setRevenusNetDeclarant2(15_000);
             calculateur.calculImpotSurRevenuNet();
         });
+    }
+	
+	@Test
+    @DisplayName("Test du deuxième abattement en mode CELIBATAIRE")
+    void testDeuxiemeAbattementCelibataire() {
+        calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+        calculateur.setRevenusNetDeclarant1(30_000);
+        calculateur.calculImpotSurRevenuNet();
+        assertThrows(DeclarantSeulException.class,
+                () -> calculateur.getAbattementDeclarant2());
+    }
+	
+	@Nested
+    @DisplayName("Calcul de l'abattement")
+    class Abattement {
+
+        @Test
+        @DisplayName("Revenus très faibles → abattement minimum (495€)")
+        void testAbattementRevenusMinimum() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(4_000); // 10% = 400 < 495
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(495, calculateur.getAbattementDeclarant1());
+        }
+
+        @Test
+        @DisplayName("Revenus élevés → abattement maximum (14 171€)")
+        void testAbattementRevenusMaximum() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(200_000); // 10% = 20 000 > 14 171
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(14_171, calculateur.getAbattementDeclarant1());
+        }
+
+        @Test
+        @DisplayName("Revenus médians → abattement à 10%")
+        void testAbattementRevenusMedians() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(30_000); // 10% = 3 000
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(3_000, calculateur.getAbattementDeclarant1());
+        }
     }
 }
