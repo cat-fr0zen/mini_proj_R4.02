@@ -241,4 +241,17 @@ public class SimultateurReusine {
             case CELIBATAIRE, DIVORCE, VEUF -> 1.0;
         };
     }
+    	
+    /**
+     * Calcule les demi-parts supplémentaires liées aux enfants à charge.
+     * @return demi-parts enfants
+     * @author picots
+     */
+    private double calculerPartsEnfants() {
+        if (nbEnfantsACharge <= 0) return 0.0;
+        if (nbEnfantsACharge <= 2) {
+            return nbEnfantsACharge * 0.5;
+        }
+        return 1.0 + (nbEnfantsACharge - 2);
+    }
 }
