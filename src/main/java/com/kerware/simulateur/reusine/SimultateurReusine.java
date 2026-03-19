@@ -266,4 +266,13 @@ public class SimultateurReusine {
         }
         return 0.0;
     }
+    
+    /**
+     * Calcule les demi-parts supplémentaires pour enfants en situation de handicap.
+     * @return demi-parts enfants handicapés
+     * @author picots
+     */
+    private double calculerPartsEnfantsHandicapes() {
+        return nbEnfantsSituationHandicap * 0.5;
+    }
 }
