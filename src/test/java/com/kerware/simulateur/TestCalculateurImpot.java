@@ -229,5 +229,43 @@ class TestCalculateurImpot {
             assertEquals(2.5, calculateur.getNbPartsFoyerFiscal());
         }
     }
+	
+	@Nested
+    @DisplayName("Impôt brut avant décote")
+    class ImpotAvantDecote {
+
+        @Test
+        @DisplayName("Revenus très faibles → impôt avant décote = 0")
+        void testImpotBrutRevenuNonImposable() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(10_000); // RFR ≈ 9 000 < seuil 1re tranche
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(0, calculateur.getImpotAvantDecote());
+        }
+
+        @Test
+        @DisplayName("Revenu dans la tranche à 11% → impôt cohérent")
+        void testImpotBrutTranche11Pourcent() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(20_000); // RFR = 18 000
+            calculateur.calculImpotSurRevenuNet();
+            int impot = calculateur.getImpotAvantDecote();
+            assertTrue(impot > 0, "L'impôt doit être positif pour ce revenu");
+            assertTrue(impot < 2_000, "L'impôt doit rester dans un ordre de grandeur cohérent");
+        }
+
+        @Test
+        @DisplayName("Revenu dans la tranche à 30% → impôt plus élevé")
+        void testImpotBrutTranche30Pourcent() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(60_000); // RFR = 54 000
+            calculateur.calculImpotSurRevenuNet();
+            int impot = calculateur.getImpotAvantDecote();
+            assertTrue(impot > 5_000, "Impôt attendu > 5 000€ pour 60 000€ de revenus");
+        }
+    }
 
 }
