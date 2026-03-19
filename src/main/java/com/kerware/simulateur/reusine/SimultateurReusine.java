@@ -254,4 +254,16 @@ public class SimultateurReusine {
         }
         return 1.0 + (nbEnfantsACharge - 2);
     }
+    
+    /**
+     * Calcule la demi-part supplémentaire pour parent isolé (case T).
+     * @return 0.5 si parent isolé avec enfant(s), sinon 0
+     * @author picots
+     */
+    private double calculerPartsParentIsole() {
+        if (estParentIsole && nbEnfantsACharge > 0) {
+            return 0.5;
+        }
+        return 0.0;
+    }
 }
