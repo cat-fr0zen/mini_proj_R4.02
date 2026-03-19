@@ -275,4 +275,28 @@ public class SimultateurReusine {
     private double calculerPartsEnfantsHandicapes() {
         return nbEnfantsSituationHandicap * 0.5;
     }
+    
+    /**
+     * Applique le barème progressif de l'impôt sur le revenu.
+     * @param revenuFiscal revenu fiscal de référence du foyer
+     * @param nbParts      nombre de parts du foyer
+     * @return impôt calculé en euros (arrondi)
+     * @author picots
+     */
+    private int calculerImpotBareme(int revenuFiscal, double nbParts) {
+        double revenuParPart = revenuFiscal / nbParts;
+        double impot = 0.0;
+
+        for (int i = 0; i < TAUX_TRANCHES.length; i++) {
+            int borneInf = LIMITES_TRANCHES[i];
+            long borneSup = LIMITES_TRANCHES[i + 1]; // long pour éviter le débordement avec MAX_VALUE
+
+            if (revenuParPart <= borneInf) break;
+
+            double imposableDansTranche = Math.min(revenuParPart, borneSup) - borneInf;
+            impot += imposableDansTranche * TAUX_TRANCHES[i];
+        }
+
+        return (int) Math.round(impot * nbParts);
+    }
 }
