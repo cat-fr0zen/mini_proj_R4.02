@@ -230,4 +230,15 @@ public class SimultateurReusine {
         // La décote ne peut pas dépasser l'impôt lui-même
         return (int) Math.min(decoteCalculee, impot);
     }
+    
+    /**Détermine le nombre de parts attribuées aux déclarants selon leur situation familiale.
+    * @return nombre de parts des déclarants
+    * @author picots 
+    */
+    private double calculerPartsDeclarants() {
+        return switch (situationFamiliale) {
+            case MARIE, PACSE -> 2.0;
+            case CELIBATAIRE, DIVORCE, VEUF -> 1.0;
+        };
+    }
 }
