@@ -299,4 +299,25 @@ public class SimultateurReusine {
 
         return (int) Math.round(impot * nbParts);
     }
+    
+    /**
+     * Applique le plafonnement du quotient familial.
+     * @param impotSansEnfants impôt calculé avec les seules parts déclarants
+     * @param impotAvecEnfants impôt calculé avec toutes les parts (enfants inclus)
+     * @param nbPartsTotales   nombre total de parts du foyer
+     * @param nbPartsDeclarants parts des déclarants uniquement
+     * @return impôt après plafonnement
+     * @author picots
+     */
+    private int appliquerPlafonnementQuotientFamilial(int impotSansEnfants, int impotAvecEnfants,
+                                                       double nbPartsTotales, double nbPartsDeclarants) {
+        double ecartParts = nbPartsTotales - nbPartsDeclarants;
+        double plafond = (ecartParts / 0.5) * PLAFOND_DEMI_PART;
+        double reductionEffective = impotSansEnfants - impotAvecEnfants;
+
+        if (reductionEffective >= plafond) {
+            return (int) Math.round(impotSansEnfants - plafond);
+        }
+        return impotAvecEnfants;
+    }
 }
