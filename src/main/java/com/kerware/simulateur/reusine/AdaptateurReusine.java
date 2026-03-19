@@ -44,7 +44,7 @@ public class AdaptateurReusine implements ICalculateurImpot{
 
 	@Override
 	public void calculImpotSurRevenuNet() {
-		
+		adapte.calculImpotSurRevenuNet();
 	}
 
 	@Override

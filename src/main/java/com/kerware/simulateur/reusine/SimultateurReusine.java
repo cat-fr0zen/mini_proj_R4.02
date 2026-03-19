@@ -77,6 +77,9 @@ public class SimultateurReusine {
     
     /** L'impôt sur le revenus net */
     private int impotNet = 0;
+    
+    /** L'impôt avant la décôte */
+    private int impotAvantDecote = 0;
 
 	/**
      * Changer le revenus net du premier déclarant
@@ -209,6 +212,38 @@ public class SimultateurReusine {
 	}
 	
 	/**
+     * Déclenche le calcul de l'impôt sur le revenu net.
+     * Les résultats sont ensuite accessibles via les getters.
+     * @author picots
+     */
+    public void calculImpotSurRevenuNet() {
+
+        // Étape 1 : calcul des abattements et du revenu fiscal de référence
+        abattementDeclarant1 = calculerAbattement(revenusNetDeclarant1);
+        abattementDeclarant2 = calculerAbattement(revenusNetDeclarant2);
+        revenuFiscalReference = (revenusNetDeclarant1 - abattementDeclarant1)
+                              + (revenusNetDeclarant2 - abattementDeclarant2);
+
+        // Étape 2 : calcul du nombre de parts du foyer fiscal
+        double nbPartsDeclarants = calculerPartsDeclarants();
+        nbPartsFoyerFiscal = nbPartsDeclarants
+                           + calculerPartsEnfants()
+                           + calculerPartsParentIsole()
+                           + calculerPartsEnfantsHandicapes();
+
+        // Étape 3 : calcul de l'impôt brut avec et sans les parts enfants
+        //           puis application du plafonnement du quotient familial
+        int impotSansEnfants = calculerImpotBareme(revenuFiscalReference, nbPartsDeclarants);
+        int impotAvecEnfants = calculerImpotBareme(revenuFiscalReference, nbPartsFoyerFiscal);
+        impotAvantDecote = appliquerPlafonnementQuotientFamilial(
+                impotSansEnfants, impotAvecEnfants, nbPartsFoyerFiscal, nbPartsDeclarants);
+
+        // Étape 4 : calcul et application de la décote
+        decote = calculerDecote(impotAvantDecote, nbPartsDeclarants);
+        impotNet = Math.max(0, impotAvantDecote - decote);
+    }
+	
+	/**
      * Calcule la décote applicable à l'impôt.
      * @param impot impôt avant décote
      * @param nbPartsDeclarants nombre de parts des déclarants (1 = seul, 2 = couple)
@@ -227,7 +262,7 @@ public class SimultateurReusine {
         }
 
         decoteCalculee = Math.round(decoteCalculee);
-        // La décote ne peut pas dépasser l'impôt lui-même
+        
         return (int) Math.min(decoteCalculee, impot);
     }
     
