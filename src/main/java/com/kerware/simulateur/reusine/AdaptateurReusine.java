@@ -2,6 +2,7 @@ package com.kerware.simulateur.reusine;
 
 import com.kerware.simulateur.ICalculateurImpot;
 import com.kerware.simulateur.SituationFamiliale;
+import com.kerware.simulateur.exception.DeclarantSeulException;
 
 public class AdaptateurReusine implements ICalculateurImpot{
 	
@@ -12,74 +13,72 @@ public class AdaptateurReusine implements ICalculateurImpot{
 	}
 
 	@Override
-	public void setRevenusNetDeclarant1(int rn) {
-		
+	public void setRevenusNetDeclarant1(int revenusNetDeclarant1) {
+		adapte.setRevenusNetDeclarant1(revenusNetDeclarant1);
 	}
 
 	@Override
-	public void setRevenusNetDeclarant2(int rn) {
-		
+	public void setRevenusNetDeclarant2(int revenusNetDeclarant2) throws DeclarantSeulException {
+		adapte.setRevenusNetDeclarant2(revenusNetDeclarant2);
 	}
 
 	@Override
-	public void setSituationFamiliale(SituationFamiliale sf) {
-		
+	public void setSituationFamiliale(SituationFamiliale situationFamiliale) {
+		adapte.setSituationsFamiliale(situationFamiliale);
 	}
 
 	@Override
-	public void setNbEnfantsACharge(int nbe) {
-		
+	public void setNbEnfantsACharge(int nbEnfantsACharge) {
+		adapte.setNbEnfantsACharge(nbEnfantsACharge);
 	}
 
 	@Override
-	public void setNbEnfantsSituationHandicap(int nbesh) {
-			
+	public void setNbEnfantsSituationHandicap(int nbEnfantsSituationHandicap) {
+		adapte.setNbEnfantsSituationHandicap(nbEnfantsSituationHandicap);
 	}
 
 	@Override
-	public void setParentIsole(boolean pi) {
-		
+	public void setParentIsole(boolean estParentIsole) {
+		adapte.setParentIsole(estParentIsole);
 	}
 
 	@Override
 	public void calculImpotSurRevenuNet() {
-		
+		adapte.calculImpotSurRevenuNet();
 	}
 
 	@Override
 	public int getRevenuFiscalReference() {
-		return 0;
+		return adapte.getRevenuFiscalReference();
 	}
 
 	@Override
 	public int getAbattementDeclarant1() {
-		return 0;
+		return adapte.getAbattementDeclarant1();
 	}
 
 	@Override
-	public int getAbattementDeclarant2() {
-		return 0;
+	public int getAbattementDeclarant2() throws DeclarantSeulException {
+		return adapte.getAbattementDeclarant1();
 	}
 
 	@Override
 	public double getNbPartsFoyerFiscal() {
-		return 0;
+		return adapte.getNbPartsFoyerFiscal();
 	}
 
 	@Override
 	public int getImpotAvantDecote() {
-		return 0;
+		return adapte.getImpotSurRevenuNet() + adapte.getDecote();
 	}
 
 	@Override
 	public int getDecote() {
-		return 0;
+		return adapte.getDecote();
 	}
 
 	@Override
 	public int getImpotSurRevenuNet() {
-		return 0;
+		return adapte.getImpotSurRevenuNet();
 	}
-
-	
 }
