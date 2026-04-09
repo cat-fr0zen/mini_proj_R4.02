@@ -467,4 +467,74 @@ class TestCalculateurImpot {
             assertTrue(calculateur.getNbPartsFoyerFiscal() > 0);
         }
 	}
+	
+	@Nested
+    @DisplayName("Cas limites")
+    class CasLimites {
+
+        @Test
+        @DisplayName("Revenus = 0 → impôt net = 0, décote = 0, RFR = 0")
+        void testRevenusNulsToutA0() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(0);
+            calculateur.calculImpotSurRevenuNet();
+            assertAll(
+                    () -> assertEquals(0, calculateur.getImpotSurRevenuNet()),
+                    () -> assertEquals(0, calculateur.getDecote()),
+                    () -> assertEquals(0, calculateur.getRevenuFiscalReference())
+            );
+        }
+
+        @Test
+        @DisplayName("Revenus très élevés → pas d'exception, impôt cohérent")
+        void revenusElevés_pasException() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(1_000_000);
+            assertDoesNotThrow(() -> calculateur.calculImpotSurRevenuNet());
+            assertTrue(calculateur.getImpotSurRevenuNet() > 0);
+        }
+
+        @Test
+        @DisplayName("0 enfant à charge + 0 enfant handicapé → nombre de parts inchangé")
+        void testSansEnfantPartsFoyerStable() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setNbEnfantsSituationHandicap(0);
+            calculateur.setRevenusNetDeclarant1(30_000);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(1.0, calculateur.getNbPartsFoyerFiscal());
+        }
+
+        @Test
+        @DisplayName("Calcul idempotent – deux appels consécutifs donnent le même résultat")
+        void testCalculImpotIdempotent() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(35_000);
+            calculateur.setNbEnfantsACharge(0);
+
+            calculateur.calculImpotSurRevenuNet();
+            int impot1 = calculateur.getImpotSurRevenuNet();
+
+            calculateur.calculImpotSurRevenuNet();
+            int impot2 = calculateur.getImpotSurRevenuNet();
+
+            assertEquals(impot1, impot2, "Deux calculs identiques doivent donner le même impôt");
+        }
+
+        @Test
+        @DisplayName("Modification des revenus après calcul initial → mise à jour au 2e calcul")
+        void testCalculImpotMiseAJourApresModification() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(30_000);
+            calculateur.calculImpotSurRevenuNet();
+            int impot1 = calculateur.getImpotSurRevenuNet();
+
+            calculateur.setRevenusNetDeclarant1(60_000);
+            calculateur.calculImpotSurRevenuNet();
+            int impot2 = calculateur.getImpotSurRevenuNet();
+
+            assertTrue(impot2 > impot1,
+                    "L'impôt doit augmenter après augmentation des revenus");
+        }
+    }
 }
