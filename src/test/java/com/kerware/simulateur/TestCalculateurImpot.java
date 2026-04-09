@@ -308,4 +308,83 @@ class TestCalculateurImpot {
             assertEquals(0, calculateur.getDecote());
         }
     }
+	
+	@Nested
+    @DisplayName("Impôt net sur le revenu")
+    class ImpotNet {
+
+        @Test
+        @DisplayName("Impôt net = impôt avant décote − décote")
+        void testImpotNetEgalImpotBrutMoinsDecote() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(25_000);
+            calculateur.calculImpotSurRevenuNet();
+            int attendu = calculateur.getImpotAvantDecote() - calculateur.getDecote();
+            assertEquals(attendu, calculateur.getImpotSurRevenuNet());
+        }
+
+        @Test
+        @DisplayName("Impôt net jamais négatif")
+        void testImpotNetJamaisNegatif() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(5_000);
+            calculateur.calculImpotSurRevenuNet();
+            assertTrue(calculateur.getImpotSurRevenuNet() >= 0,
+                    "L'impôt net ne peut pas être négatif");
+        }
+
+        @Test
+        @DisplayName("Revenus non imposables → impôt net nul")
+        void testImpotNetRevenuNonImposable() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(10_000);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(0, calculateur.getImpotSurRevenuNet());
+        }
+
+        @Test
+        @DisplayName("Ajout d'enfants réduit l'impôt net (quotient familial)")
+        void testImpotNetEnfantsReduisentImpot() {
+            // Sans enfant
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(50_000);
+            calculateur.calculImpotSurRevenuNet();
+            int impotSansEnfant = calculateur.getImpotSurRevenuNet();
+
+            // Avec 2 enfants
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(2);
+            calculateur.setRevenusNetDeclarant1(50_000);
+            calculateur.calculImpotSurRevenuNet();
+            int impotAvecEnfants = calculateur.getImpotSurRevenuNet();
+
+            assertTrue(impotAvecEnfants < impotSansEnfant,
+                    "Les enfants à charge doivent réduire l'impôt");
+        }
+
+        @Test
+        @DisplayName("Parent isolé bénéficie d'une part supplémentaire → impôt réduit")
+        void testImpotNetParentIsoleBeneficePartSupp() {
+            // Parent NON isolé
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(1);
+            calculateur.setParentIsole(false);
+            calculateur.setRevenusNetDeclarant1(40_000);
+            calculateur.calculImpotSurRevenuNet();
+            int impotNonIsole = calculateur.getImpotSurRevenuNet();
+
+            // Parent isolé mêmes revenus
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(1);
+            calculateur.setParentIsole(true);
+            calculateur.setRevenusNetDeclarant1(40_000);
+            calculateur.calculImpotSurRevenuNet();
+            int impotIsole = calculateur.getImpotSurRevenuNet();
+
+            assertTrue(impotIsole <= impotNonIsole,
+                    "Le statut de parent isolé doit diminuer ou maintenir l'impôt");
+        }
+    }
 }
