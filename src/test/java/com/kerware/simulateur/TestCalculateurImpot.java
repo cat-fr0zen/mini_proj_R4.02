@@ -1,11 +1,18 @@
 package com.kerware.simulateur;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.kerware.simulateur.exception.DeclarantSeulException;
 import com.kerware.simulateur.reusine.AdaptateurReusine;
@@ -387,4 +394,77 @@ class TestCalculateurImpot {
                     "Le statut de parent isolé doit diminuer ou maintenir l'impôt");
         }
     }
+	
+	@Nested
+    @DisplayName("Tests paramétrés - cohérence globale")
+    class TestsParametres {
+
+        /**
+         * Vérifie que l'impôt net est croissant avec le revenu (toutes choses égales).
+         * Format CSV : revenuFaible, revenuEleve
+         */
+        @ParameterizedTest(name = "revenu {0}€ < impôt que revenu {1}€")
+        @CsvSource({
+                "15000, 20000",
+                "20000, 30000",
+                "30000, 50000",
+                "50000, 80000",
+                "80000, 150000"
+        })
+        @DisplayName("L'impôt croît avec le revenu")
+        void testImpotNetCroissantAvecRevenu(int revenuFaible, int revenuEleve) {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(revenuFaible);
+            calculateur.calculImpotSurRevenuNet();
+            int impotFaible = calculateur.getImpotSurRevenuNet();
+
+           
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(revenuEleve);
+            calculateur.calculImpotSurRevenuNet();
+            int impotEleve = calculateur.getImpotSurRevenuNet();
+
+            assertTrue(impotEleve >= impotFaible,
+                    "L'impôt doit être croissant avec le revenu");
+        }
+
+        /**
+         * Vérifie que les revenus non imposables donnent bien un impôt nul.
+         */
+        @ParameterizedTest(name = "revenu {0}€ → impôt nul")
+        @ValueSource(ints = {0, 1_000, 5_000, 10_000})
+        @DisplayName("Très faibles revenus → impôt net nul")
+        void testImpotNetRevenusTresFaiblesNul(int revenu) {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(revenu);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(0, calculateur.getImpotSurRevenuNet(),
+                    "Un revenu de " + revenu + "€ ne devrait pas être imposable");
+        }
+
+        /**
+         * Vérifie la cohérence nbEnfantsSituationHandicap ≤ nbEnfantsACharge.
+         * (comportement attendu : pas d'exception, mais résultat cohérent)
+         */
+        @ParameterizedTest(name = "{0} enfants dont {1} handicapés")
+        @CsvSource({
+                "1, 1",
+                "2, 1",
+                "3, 2",
+                "4, 4"
+        })
+        @DisplayName("Nombre d'enfants handicapés ≤ nombre d'enfants à charge")
+        void testEnfantsHandicapCoherentAvecEnfantsACharge(int nbEnfants, int nbHandicap) {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(40_000);
+            calculateur.setNbEnfantsACharge(nbEnfants);
+            calculateur.setNbEnfantsSituationHandicap(nbHandicap);
+            assertDoesNotThrow(() -> calculateur.calculImpotSurRevenuNet(),
+                    "Le calcul ne doit pas lever d'exception pour une configuration cohérente");
+            assertTrue(calculateur.getNbPartsFoyerFiscal() > 0);
+        }
+	}
 }
