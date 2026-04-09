@@ -7,9 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.kerware.simulateur.AdaptateurHerite;
-import com.kerware.simulateur.ICalculateurImpot;
-import com.kerware.simulateur.SituationFamiliale;
 import com.kerware.simulateur.exception.DeclarantSeulException;
 import com.kerware.simulateur.reusine.AdaptateurReusine;
 
@@ -225,7 +222,6 @@ class TestCalculateurImpot {
             calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
             calculateur.setNbEnfantsACharge(3);
             calculateur.calculImpotSurRevenuNet();
-            // 1 + 0.5 * 3 = 2.5
             assertEquals(2.5, calculateur.getNbPartsFoyerFiscal());
         }
     }
@@ -239,7 +235,7 @@ class TestCalculateurImpot {
         void testImpotBrutRevenuNonImposable() {
             calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
             calculateur.setNbEnfantsACharge(0);
-            calculateur.setRevenusNetDeclarant1(10_000); // RFR ≈ 9 000 < seuil 1re tranche
+            calculateur.setRevenusNetDeclarant1(10_000);
             calculateur.calculImpotSurRevenuNet();
             assertEquals(0, calculateur.getImpotAvantDecote());
         }
@@ -249,7 +245,7 @@ class TestCalculateurImpot {
         void testImpotBrutTranche11Pourcent() {
             calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
             calculateur.setNbEnfantsACharge(0);
-            calculateur.setRevenusNetDeclarant1(20_000); // RFR = 18 000
+            calculateur.setRevenusNetDeclarant1(20_000);
             calculateur.calculImpotSurRevenuNet();
             int impot = calculateur.getImpotAvantDecote();
             assertTrue(impot > 0, "L'impôt doit être positif pour ce revenu");
@@ -267,5 +263,49 @@ class TestCalculateurImpot {
             assertTrue(impot > 5_000, "Impôt attendu > 5 000€ pour 60 000€ de revenus");
         }
     }
+	
+	@Nested
+    @DisplayName("Décote")
+    class Decote {
 
+        @Test
+        @DisplayName("Impôt faible → décote positive")
+        void testDecoteImpotFaible() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(18_000);
+            calculateur.calculImpotSurRevenuNet();
+            assertTrue(calculateur.getDecote() > 0, "Une décote est attendue pour un impôt modeste");
+        }
+
+        @Test
+        @DisplayName("Impôt élevé (> seuil décote) → décote nulle")
+        void testDecoteImpotEleve() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(80_000);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(0, calculateur.getDecote(), "Aucune décote pour un impôt élevé");
+        }
+
+        @Test
+        @DisplayName("Décote ne peut pas rendre l'impôt négatif")
+        void testDecoteNePasDepasserImpotAvantDecote() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setNbEnfantsACharge(0);
+            calculateur.setRevenusNetDeclarant1(15_000);
+            calculateur.calculImpotSurRevenuNet();
+            assertTrue(calculateur.getDecote() <= calculateur.getImpotAvantDecote(),
+                    "La décote ne doit pas excéder l'impôt avant décote");
+        }
+
+        @Test
+        @DisplayName("Revenus nuls → décote nulle (pas d'impôt à décôter)")
+        void testDecoteRevenusNuls() {
+            calculateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+            calculateur.setRevenusNetDeclarant1(0);
+            calculateur.calculImpotSurRevenuNet();
+            assertEquals(0, calculateur.getDecote());
+        }
+    }
 }
