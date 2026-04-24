@@ -59,7 +59,7 @@ public class AdaptateurReusine implements ICalculateurImpot{
 
 	@Override
 	public int getAbattementDeclarant2() throws DeclarantSeulException {
-		return adapte.getAbattementDeclarant1();
+		return adapte.getAbattementDeclarant2();
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class AdaptateurReusine implements ICalculateurImpot{
 
 	@Override
 	public int getImpotAvantDecote() {
-		return adapte.getImpotSurRevenuNet() + adapte.getDecote();
+		return adapte.getImpotAvantDecote();
 	}
 
 	@Override

@@ -110,6 +110,12 @@ public class SimultateurReusine {
 	 */
 	public void setSituationsFamiliale(SituationFamiliale situationFamiliale) {
 		this.situationFamiliale = situationFamiliale;
+		// Chaque scénario de calcul repart d'un état familial neutre.
+		this.revenusNetDeclarant2 = 0;
+		this.nbEnfantsACharge = 0;
+		this.nbEnfantsSituationHandicap = 0;
+		this.estParentIsole = false;
+		this.abattementDeclarant2 = 0;
 	}
 	
 	/**
@@ -207,8 +213,16 @@ public class SimultateurReusine {
 	 * @return l'impôt sur le revenu net
 	 * @author picots
 	 */
-	public int getImpotSurRevenuNet() {
+    public int getImpotSurRevenuNet() {
 		return impotNet;
+	}
+
+	/**
+	 * Obtenir l'impôt avant décote.
+	 * @return l'impôt avant décote
+	 */
+	public int getImpotAvantDecote() {
+		return impotAvantDecote;
 	}
 	
 	/**
@@ -217,12 +231,18 @@ public class SimultateurReusine {
      * @author picots
      */
     public void calculImpotSurRevenuNet() {
+        if (situationFamiliale == null) {
+            return;
+        }
+
+        boolean foyerAvecDeuxDeclarants = situationFamiliale == SituationFamiliale.MARIE
+                || situationFamiliale == SituationFamiliale.PACSE;
 
         // Étape 1 : calcul des abattements et du revenu fiscal de référence
         abattementDeclarant1 = calculerAbattement(revenusNetDeclarant1);
-        abattementDeclarant2 = calculerAbattement(revenusNetDeclarant2);
+        abattementDeclarant2 = foyerAvecDeuxDeclarants ? calculerAbattement(revenusNetDeclarant2) : 0;
         revenuFiscalReference = (revenusNetDeclarant1 - abattementDeclarant1)
-                              + (revenusNetDeclarant2 - abattementDeclarant2);
+                              + (foyerAvecDeuxDeclarants ? (revenusNetDeclarant2 - abattementDeclarant2) : 0);
 
         // Étape 2 : calcul du nombre de parts du foyer fiscal
         double nbPartsDeclarants = calculerPartsDeclarants();
@@ -283,11 +303,10 @@ public class SimultateurReusine {
      * @author picots
      */
     private double calculerPartsEnfants() {
-        if (nbEnfantsACharge <= 0) return 0.0;
-        if (nbEnfantsACharge <= 2) {
-            return nbEnfantsACharge * 0.5;
+        if (nbEnfantsACharge <= 0) {
+            return 0.0;
         }
-        return 1.0 + (nbEnfantsACharge - 2);
+        return nbEnfantsACharge * 0.5;
     }
     
     /**
@@ -296,7 +315,7 @@ public class SimultateurReusine {
      * @author picots
      */
     private double calculerPartsParentIsole() {
-        if (estParentIsole && nbEnfantsACharge > 0) {
+        if (estParentIsole && nbEnfantsACharge > 0 && calculerPartsDeclarants() == 1.0) {
             return 0.5;
         }
         return 0.0;
