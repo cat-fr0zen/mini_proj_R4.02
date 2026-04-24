@@ -5,7 +5,7 @@ import com.kerware.simulateur.SituationFamiliale;
 
 public class AdaptateurReusine implements ICalculateurImpot{
 	
-	SimultateurReusine adapte;
+	private final SimultateurReusine adapte;
 	
 	public AdaptateurReusine() {
 		adapte = new SimultateurReusine();
