@@ -3,9 +3,9 @@ package com.kerware.simulateur;
 import com.kerware.simulateur.exception.DeclarantSeulException;
 
 public class AdaptateurHerite implements ICalculateurImpot {
-	
-	SimulateurHerite adapte;
-	
+
+	private final SimulateurHerite adapte;
+
 	public AdaptateurHerite() {
 		adapte = new SimulateurHerite();
 	}
@@ -14,7 +14,7 @@ public class AdaptateurHerite implements ICalculateurImpot {
 	public void setRevenusNetDeclarant1(int revenusNetDeclarant1) {
 		adapte.setRevenusNetDeclarant1(revenusNetDeclarant1);
 	}
-	
+
 	@Override
 	public void setRevenusNetDeclarant2(int revenusNetDeclarant2) throws DeclarantSeulException {
 		adapte.setRevenusNetDeclarant2(revenusNetDeclarant2);
@@ -54,7 +54,7 @@ public class AdaptateurHerite implements ICalculateurImpot {
 	public int getAbattementDeclarant1() {
 		return adapte.getAbattementDeclarant1();
 	}
-	
+
 	@Override
 	public int getAbattementDeclarant2() throws DeclarantSeulException {
 		return adapte.getAbattementDeclarant2();
@@ -78,6 +78,6 @@ public class AdaptateurHerite implements ICalculateurImpot {
 	@Override
 	public int getImpotSurRevenuNet() {
 		return adapte.getImpotSurRevenuNet();
-	}
+	}	
 
 }

@@ -241,11 +241,13 @@ public class SimulateurHerite {
         System.out.println("Impot sur le revenu net : " + impot);
 
     }
-
+    
     //Nouveaux champs
     private SituationFamiliale situationFamiliale;
     private int revenusNetDeclarant2;
     private int abattementDeclarant2;
+
+    private static final double DEMI_PART = 0.5;
     
     /**
      * Changer le revenus net du premier déclarant
@@ -274,8 +276,13 @@ public class SimulateurHerite {
 	 * @param situationFamiliale la nouvelle situation familiale
 	 * @author picots
 	 */
-	public void setSituationsFamiliale(SituationFamiliale situationFamiliale) {
+	void setSituationsFamiliale(SituationFamiliale situationFamiliale) {
 		this.situationFamiliale = situationFamiliale;
+		revenusNetDeclarant2 = 0;
+		nbEnf = 0;
+		nbEnfH = 0;
+		parIso = false;
+		abattementDeclarant2 = 0;
 	}
 	
 	/**
@@ -310,7 +317,36 @@ public class SimulateurHerite {
 	 * @author picots
 	 */
 	public void calculImpotSurRevenuNet() {
-		calculImpot(rNet, situationFamiliale, nbEnfH, nbEnf, parIso);
+		if (situationFamiliale == null) {
+			return;
+		}
+
+		int revenusNetDeclarant1 = rNet;
+		int abattementDeclarant1 = calculerAbattementIndividuel(revenusNetDeclarant1);
+		boolean foyerAvecDeuxDeclarants = situationFamiliale == SituationFamiliale.MARIE
+				|| situationFamiliale == SituationFamiliale.PACSE;
+		abattementDeclarant2 = foyerAvecDeuxDeclarants
+				? calculerAbattementIndividuel(revenusNetDeclarant2) : 0;
+		int revenuTotal = revenusNetDeclarant1
+				+ (foyerAvecDeuxDeclarants ? revenusNetDeclarant2 : 0);
+
+		if (revenuTotal <= 0) {
+			abt = 0;
+			rFRef = 0;
+			nbPtsDecl = calculerPartsDeclarants();
+			nbPts = calculerNbPartsFoyer(nbPtsDecl);
+			decote = 0;
+			mImp = 0;
+			return;
+		}
+
+		calculImpot(revenuTotal, situationFamiliale, nbEnf, nbEnfH, parIso);
+
+		abt = abattementDeclarant1;
+		rFRef = revenusNetDeclarant1 - abattementDeclarant1
+				+ (foyerAvecDeuxDeclarants ? revenusNetDeclarant2 - abattementDeclarant2 : 0);
+		nbPtsDecl = calculerPartsDeclarants();
+		nbPts = calculerNbPartsFoyer(nbPtsDecl);
 	}
 	
 	/**
@@ -342,9 +378,9 @@ public class SimulateurHerite {
 				return abattementDeclarant2;
 			default :
 				throw new DeclarantSeulException();
-		}
+		}	
 	}
-	
+			
 	/**
 	 * Obtenir le nombre de parts du foyer fiscal
 	 * @return le nombre de parts du foyer fiscal
@@ -370,6 +406,60 @@ public class SimulateurHerite {
 	 */
 	public int getImpotSurRevenuNet() {
 		return (int)mImp;
+	}
+	
+	/**
+	 * Calculer l'abattement individuel d'un déclarant
+	 * @param revenusNet le revenu net du déclarant
+	 * @return l'abattement individuel du déclarant
+	 * @author picots
+	 */
+	private int calculerAbattementIndividuel(int revenusNet) {
+		if (revenusNet <= 0) {
+			return 0;
+		}
+
+		double abattementCalcule = revenusNet * tAbt;
+		if (abattementCalcule > lAbtMax) {
+			abattementCalcule = lAbtMax;
+		}
+		if (abattementCalcule < lAbtMin) {
+			abattementCalcule = lAbtMin;
+		}
+		return (int) Math.round(abattementCalcule);
+	}
+	
+	/**
+	 * Calculer le nombre de parts des déclarants
+	 * @return le nombre de parts des déclarants
+	 * @author picots
+	 */
+	private double calculerPartsDeclarants() {
+		switch (situationFamiliale) {
+			case MARIE:
+			case PACSE:
+				return 2.0;
+			case CELIBATAIRE:
+			case DIVORCE:
+			case VEUF:
+			default:
+				return 1.0;
+		}
+	}
+	
+	/**
+	 * Calculer le nombre de parts d'un foyer
+	 * @param nbPartsDeclarants le nombre de parts des déclarants
+	 * @return le nombre de parts d'un foyer
+	 * @author picots
+	 */
+	private double calculerNbPartsFoyer(double nbPartsDeclarants) {
+		double nbPartsCalcule = nbPartsDeclarants + (nbEnf * DEMI_PART)
+				+ (nbEnfH * DEMI_PART);
+		if (parIso && nbEnf > 0 && nbPartsDeclarants == 1.0) {
+			nbPartsCalcule += DEMI_PART;
+		}
+		return nbPartsCalcule;
 	}
 	
 	
